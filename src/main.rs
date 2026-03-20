@@ -30,7 +30,7 @@ async fn main() {
     let addr = format!("{}:{}", config.host, config.port);
     
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new("debug")) // change level here
+        .with(tracing_subscriber::EnvFilter::new("debug"))
         .with(tracing_subscriber::fmt::layer())
         .init();
 
