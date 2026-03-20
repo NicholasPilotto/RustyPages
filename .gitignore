@@ -58,3 +58,5 @@ Temporary Items
 # already existing elements were commented out
 
 #/target
+
+.env
