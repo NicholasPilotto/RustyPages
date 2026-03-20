@@ -47,3 +47,14 @@ Temporary Items
 .history/
 
 # End of https://mrkandreev.name/snippets/gitignore-generator/#Rust,macOS,VisualStudioCode
+
+# Added by cargo
+
+/target
+
+
+# Added by cargo
+#
+# already existing elements were commented out
+
+#/target
