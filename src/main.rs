@@ -1,25 +1,13 @@
+mod config;
+mod domain;
+mod routes;
+
 use axum::Router;
 use tower_http::trace::TraceLayer;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-
-use std::env;
-
-struct Config {
-    host: String,
-    port: u16,
-}
-
-impl Config {
-    fn from_env() -> Self {
-        Config {
-            host: env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_string()),
-            port: env::var("PORT")
-                .unwrap_or_else(|_| "3000".to_string())
-                .parse()
-                .expect("PORT must be a valid number"),
-        }
-    }
-}
+use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use config::Config;
+use routes::book_routes::{book_router, BookAppState};
+use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() {
@@ -30,14 +18,17 @@ async fn main() {
     let addr = format!("{}:{}", config.host, config.port);
     
     tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new("debug"))
-        .with(tracing_subscriber::fmt::layer())
+        .with(EnvFilter::new("debug"))
+        .with(fmt::layer())
         .init();
 
+    let book_state = BookAppState {};
+
     let app = Router::new()
+        .merge(book_router().with_state(book_state))
         .layer(TraceLayer::new_for_http());
 
-    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    let listener = TcpListener::bind(&addr).await.unwrap();
     
     println!("Listening on http://{}", addr);
 
