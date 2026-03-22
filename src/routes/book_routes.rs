@@ -13,7 +13,10 @@ pub struct BookAppState {}
 #[derive(OpenApi)]
 #[openapi(
     paths(get_books),
-    components(schemas(Book))
+    components(schemas(Book)),
+    tags(
+        (name = "Books", description = "Books management API")
+    )
 )]
 pub struct BookApi;
 
@@ -26,7 +29,7 @@ pub fn book_router() -> Router<BookAppState> {
     get,
     path = "/book",
     responses(
-        (status = 200, description = "List of books", body = Vec<Book>),
+        (status = 200, description = "List of books", body = [Book]),
     )
 )]
 async fn get_books() -> axum::Json<Vec<Book>>{
