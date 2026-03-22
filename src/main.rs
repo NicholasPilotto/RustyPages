@@ -9,6 +9,17 @@ use config::Config;
 use routes::book_routes::{book_router, BookAppState};
 use tokio::net::TcpListener;
 
+use utoipa::OpenApi;
+use utoipa_scalar::{Scalar, Servable};
+
+use crate::routes::book_routes::BookApi;
+
+#[derive(OpenApi)]
+#[openapi(
+    info(title = "RustyPages", version = "1.0.0"),
+)]
+struct ApiDoc;
+
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().expect("Failed to load .env file");
@@ -24,13 +35,18 @@ async fn main() {
 
     let book_state = BookAppState {};
 
+    let mut doc = ApiDoc::openapi();
+    doc.merge(BookApi::openapi());
+
     let app = Router::new()
         .merge(book_router().with_state(book_state))
+        .merge(Scalar::with_url("/scalar", doc))
         .layer(TraceLayer::new_for_http());
 
     let listener = TcpListener::bind(&addr).await.unwrap();
     
     println!("Listening on http://{}", addr);
+    println!("Scalar docs at http://{}/scalar", addr);
 
     axum::serve(listener, app).await.unwrap();
 }

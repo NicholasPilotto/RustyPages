@@ -11,4 +11,6 @@ tokio = { version = "1.50.0", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.6.8", features = ["trace"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.23", features = ["fmt", "env-filter"] }
+utoipa = { version = "5.4.0", features = ["axum_extras", "uuid"] }
+utoipa-scalar = { version = "0.3.0", features = ["axum"] }
 uuid = {version = "1.22.0", features = ["v4", "serde"]}
