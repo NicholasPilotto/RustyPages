@@ -1,6 +1,7 @@
 mod config;
 mod domain;
 mod routes;
+mod infrastructure;
 
 use axum::Router;
 use tower_http::trace::TraceLayer;
@@ -11,6 +12,7 @@ use tokio::net::TcpListener;
 
 use utoipa::OpenApi;
 use utoipa_scalar::{Scalar, Servable};
+use infrastructure::db::create_db_connection;
 
 use crate::routes::book_routes::BookApi;
 
@@ -33,7 +35,11 @@ async fn main() {
         .with(fmt::layer())
         .init();
 
-    let book_state = BookAppState {};
+    let db = create_db_connection(&config.database_url).await;
+
+    let book_state = BookAppState {
+        db: db
+    };
 
     let mut doc = ApiDoc::openapi();
     doc.merge(BookApi::openapi());

@@ -6,6 +6,8 @@ edition = "2024"
 [dependencies]
 axum = "0.8.8"
 dotenvy = "0.15.7"
+sea-orm = { version = "1.1.19", features = ["sqlx-postgres", "runtime-tokio-native-tls", "macros", "with-chrono", "with-json", "with-uuid"] }
+sea-orm-migration = "1.1.19"
 serde = { version = "1.0.228", features = ["derive"] }
 tokio = { version = "1.50.0", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.6.8", features = ["trace"] }

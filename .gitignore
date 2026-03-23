@@ -52,7 +52,6 @@ Temporary Items
 
 /target
 
-
 # Added by cargo
 #
 # already existing elements were commented out
@@ -60,3 +59,5 @@ Temporary Items
 #/target
 
 .env
+
+_data/
