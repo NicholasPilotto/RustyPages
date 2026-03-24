@@ -14,7 +14,9 @@ use utoipa::OpenApi;
 use utoipa_scalar::{Scalar, Servable};
 use infrastructure::db::create_db_connection;
 
-use crate::routes::book_routes::BookApi;
+use crate::routes::book_routes::{BookApi};
+
+mod queries;
 
 #[derive(OpenApi)]
 #[openapi(

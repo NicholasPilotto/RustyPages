@@ -1,12 +1,16 @@
+use axum::Json;
+use axum::extract::State;
+use axum::http::StatusCode;
 use axum::{
-    Router, routing::{get}
+    Router, response::IntoResponse, routing::get
 };
 
 use sea_orm::DatabaseConnection;
 use utoipa::OpenApi;
-use uuid::Uuid;
 
-use crate::domain::book::Book;
+use crate::infrastructure::repositories::book_repository::BookRepository;
+use crate::queries::handlers::get_books_handler::*;
+use crate::queries::models::book_view::BookView;
 
 #[derive(Clone)]
 pub struct BookAppState {
@@ -16,7 +20,7 @@ pub struct BookAppState {
 #[derive(OpenApi)]
 #[openapi(
     paths(get_books),
-    components(schemas(Book)),
+    components(schemas(BookView)),
     tags(
         (name = "Books", description = "Books management API")
     )
@@ -32,15 +36,17 @@ pub fn book_router() -> Router<BookAppState> {
     get,
     path = "/book",
     responses(
-        (status = 200, description = "List of books", body = [Book]),
+        (status = 200, description = "List of books", body = [BookView]),
     ),
     description = "Get the list of books",
     tag = "Books"
 )]
-async fn get_books() -> axum::Json<Vec<Book>>{
-     axum::Json(vec![
-        Book { id: Uuid::new_v4() },
-        Book { id: Uuid::new_v4() },
-        Book { id: Uuid::new_v4() },
-    ])
+async fn get_books(
+    State(state): State<BookAppState>,
+) -> impl IntoResponse {
+    let repo = BookRepository::new(&state.db);
+    match get_books_handler(&repo).await {
+        Ok(books) => Json(books).into_response(),
+        Err(e) => (StatusCode::BAD_REQUEST, e.to_string()).into_response(),
+    }
 }
