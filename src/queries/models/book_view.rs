@@ -3,6 +3,8 @@ use serde::Serialize;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
+use crate::domain::book::{Model as BookEntity};
+
 #[derive(Serialize, ToSchema)]
 pub struct BookView {
     /// The unique book identifier.
@@ -40,4 +42,21 @@ pub struct BookView {
     
     #[schema(value_type = String, format = "date-time")]
     pub updated_at: DateTimeUtc,
+}
+
+impl From<BookEntity> for BookView {
+    fn from(book: BookEntity) -> Self {
+        Self {
+            id: book.id,
+            title: book.title,
+            description: book.description,
+            author: book.author,
+            isbn: book.isbn,
+            published_at: book.published_at,
+            pages: book.pages,
+            language: book.language,
+            created_at: book.created_at,
+            updated_at: book.updated_at,
+        }
+    }
 }

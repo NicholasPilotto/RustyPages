@@ -19,18 +19,7 @@ impl<'a> BookRepository<'a> {
 
         let result: Vec<BookView> = books
             .into_iter()
-            .map(|book| BookView {
-                id: book.id,
-                title: book.title,
-                description: book.description,
-                author: book.author,
-                isbn: book.isbn,
-                published_at: book.published_at,
-                pages: book.pages,
-                language: book.language,
-                created_at: book.created_at,
-                updated_at: book.updated_at,
-            })
+            .map(BookView::from)
             .collect();
 
         Ok(result)
