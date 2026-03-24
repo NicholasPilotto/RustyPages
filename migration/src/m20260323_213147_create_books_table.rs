@@ -20,12 +20,12 @@ impl MigrationTrait for Migration {
         manager
             .create_table(
                 Table::create()
-                    .table(Book::Table)
+                    .table(Books::Table)
                     .if_not_exists()
 
                     // Primary key (UUID)
                     .col(
-                        ColumnDef::new(Book::Id)
+                        ColumnDef::new(Books::Id)
                             .uuid()
                             .not_null()
                             .default(Expr::cust("uuid_generate_v4()"))
@@ -33,26 +33,28 @@ impl MigrationTrait for Migration {
                     )
 
                     // Core fields
-                    .col(string(Book::Title))
-                    .col(text_null(Book::Description))
-                    .col(string(Book::Author))
+                    .col(string(Books::Title))
+                    .col(text_null(Books::Description))
+                    .col(string(Books::Author))
 
                     // Metadata
-                    .col(string_null(Book::Isbn))
-                    .col(date_null(Book::PublishedAt))
-                    .col(integer_null(Book::Pages))
-                    .col(string_null(Book::Language))
+                    .col(string_null(Books::Isbn))
+                    .col(ColumnDef::new(Books::PublishedAt)
+                            .timestamp_with_time_zone()
+                            .null())
+                    .col(integer_null(Books::Pages))
+                    .col(string_null(Books::Language))
 
                     // Timestamps
                     .col(
-                        ColumnDef::new(Book::CreatedAt)
-                            .timestamp()
+                        ColumnDef::new(Books::CreatedAt)
+                            .timestamp_with_time_zone()
                             .not_null()
                             .default(Expr::current_timestamp())
                     )
                     .col(
-                        ColumnDef::new(Book::UpdatedAt)
-                            .timestamp()
+                        ColumnDef::new(Books::UpdatedAt)
+                            .timestamp_with_time_zone()
                             .not_null()
                             .default(Expr::current_timestamp())
                     )
@@ -66,8 +68,8 @@ impl MigrationTrait for Migration {
             .create_index(
                 Index::create()
                     .name("idx-books-isbn")
-                    .table(Book::Table)
-                    .col(Book::Isbn)
+                    .table(Books::Table)
+                    .col(Books::Isbn)
                     .to_owned()
             )
             .await?;
@@ -81,7 +83,7 @@ impl MigrationTrait for Migration {
             .drop_index(
                 Index::drop()
                     .name("idx-books-isbn")
-                    .table(Book::Table)
+                    .table(Books::Table)
                     .to_owned()
             )
             .await?;
@@ -90,7 +92,7 @@ impl MigrationTrait for Migration {
         manager
             .drop_table(
                 Table::drop()
-                    .table(Book::Table)
+                    .table(Books::Table)
                     .to_owned()
             )
             .await
@@ -98,7 +100,7 @@ impl MigrationTrait for Migration {
 }
 
 #[derive(Iden)]
-enum Book {
+enum Books {
     Table,
     Id,
     Title,
