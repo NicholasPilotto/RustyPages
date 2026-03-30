@@ -1,14 +1,13 @@
-
 use axum::{
+    Json,
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use sea_orm::DbErr;
 use serde::Serialize;
+use std::fmt;
 use utoipa::ToSchema;
 use validator::ValidationErrors;
-use std::fmt;
 
 #[derive(Debug)]
 pub enum AppError {
@@ -43,7 +42,6 @@ impl From<DbErr> for AppError {
     }
 }
 
-
 impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -61,13 +59,11 @@ impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         match self {
             AppError::NotFound(msg) => {
-                ErrorResponse::new(StatusCode::NOT_FOUND, msg)
-                    .into_response()
+                ErrorResponse::new(StatusCode::NOT_FOUND, msg).into_response()
             }
 
             AppError::BadRequest(msg) => {
-                ErrorResponse::new(StatusCode::BAD_REQUEST, msg)
-                    .into_response()
+                ErrorResponse::new(StatusCode::BAD_REQUEST, msg).into_response()
             }
 
             AppError::ValidationFailed(errors) => {
@@ -116,10 +112,7 @@ impl ErrorResponse {
         }
     }
 
-    pub fn with_details(
-        mut self,
-        details: serde_json::Value
-    ) -> Self {
+    pub fn with_details(mut self, details: serde_json::Value) -> Self {
         self.details = Some(details);
         self
     }

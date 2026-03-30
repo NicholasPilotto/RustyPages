@@ -1,28 +1,26 @@
 mod config;
 mod domain;
-mod routes;
 mod infrastructure;
+mod routes;
 
 use axum::Router;
+use config::Config;
+use routes::book_routes::{BookAppState, book_router};
+use tokio::net::TcpListener;
 use tower_http::trace::TraceLayer;
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
-use config::Config;
-use routes::book_routes::{book_router, BookAppState};
-use tokio::net::TcpListener;
 
+use infrastructure::db::create_db_connection;
 use utoipa::OpenApi;
 use utoipa_scalar::{Scalar, Servable};
-use infrastructure::db::create_db_connection;
 
-use crate::routes::book_routes::{BookApi};
+use crate::routes::book_routes::BookApi;
 
-mod queries;
 mod commands;
+mod queries;
 
 #[derive(OpenApi)]
-#[openapi(
-    info(title = "RustyPages", version = "1.0.0"),
-)]
+#[openapi(info(title = "RustyPages", version = "1.0.0"))]
 struct ApiDoc;
 
 #[tokio::main]
@@ -32,7 +30,7 @@ async fn main() {
     let config = Config::from_env();
 
     let addr = format!("{}:{}", config.host, config.port);
-    
+
     tracing_subscriber::registry()
         .with(EnvFilter::new("debug"))
         .with(fmt::layer())
@@ -40,9 +38,7 @@ async fn main() {
 
     let db = create_db_connection(&config.database_url).await;
 
-    let book_state = BookAppState {
-        db: db
-    };
+    let book_state = BookAppState { db };
 
     let mut doc = ApiDoc::openapi();
     doc.merge(BookApi::openapi());
@@ -53,7 +49,7 @@ async fn main() {
         .layer(TraceLayer::new_for_http());
 
     let listener = TcpListener::bind(&addr).await.unwrap();
-    
+
     println!("Listening on http://{}", addr);
     println!("Scalar docs at http://{}/scalar", addr);
 

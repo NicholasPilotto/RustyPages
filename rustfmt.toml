@@ -1,0 +1,32 @@
+# rustfmt.toml
+
+# Maximum line width before wrapping
+max_width = 100
+
+# Number of spaces per indentation level
+tab_spaces = 4
+
+# Use field init shorthand where possible: `Self { name }` instead of `Self { name: name }`
+use_field_init_shorthand = true
+
+# Add trailing commas in function arguments, structs, etc.
+trailing_comma = "Always"
+
+# Group and sort imports
+imports_granularity = "Module"
+group_imports = "StdExternalCrate"   # std → external crates → internal
+
+# Condense small structs/enums onto one line when they fit
+struct_lit_single_line = true
+
+# Format strings inside macros like println!, format!, etc.
+format_macro_matchers = true
+
+# Normalize doc comments to use ///
+normalize_doc_attributes = true
+
+# Force `fn` return type on the same line as the signature
+fn_single_line = false
+
+# Brace style for control flow
+brace_style = "PreferSameLine"

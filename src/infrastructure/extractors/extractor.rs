@@ -1,8 +1,8 @@
 use axum::{
+    Json,
     extract::{FromRequest, Request},
     http::StatusCode,
     response::{IntoResponse, Response},
-    Json,
 };
 use serde::de::DeserializeOwned;
 use validator::Validate;

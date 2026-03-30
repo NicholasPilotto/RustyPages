@@ -1,5 +1,5 @@
-use sea_orm_migration::seaql_migrations::Relation;
 use sea_orm::entity::prelude::*;
+use sea_orm_migration::seaql_migrations::Relation;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

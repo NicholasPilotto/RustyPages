@@ -1,7 +1,7 @@
-use sea_orm::{DatabaseConnection, EntityTrait};
-use crate::domain::book::{Entity as BookEntity};
+use crate::domain::book::Entity as BookEntity;
 use crate::infrastructure::errors::error::AppError;
 use crate::queries::models::book_view::BookView;
+use sea_orm::{DatabaseConnection, EntityTrait};
 use uuid::Uuid;
 
 pub struct BookRepository<'a> {
@@ -28,10 +28,7 @@ impl<'a> BookRepository<'a> {
             .await
             .map_err(|e| e.to_string())?;
 
-        let result: Vec<BookView> = books
-            .into_iter()
-            .map(BookView::from)
-            .collect();
+        let result: Vec<BookView> = books.into_iter().map(BookView::from).collect();
 
         Ok(result)
     }

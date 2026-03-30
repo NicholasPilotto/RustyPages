@@ -1,14 +1,13 @@
 use axum::Json;
 use axum::extract::{Path, State};
 use axum::routing::post;
-use axum::{
-    Router, response::IntoResponse, routing::get
-};
+use axum::{Router, response::IntoResponse, routing::get};
 
 use sea_orm::DatabaseConnection;
 use utoipa::OpenApi;
 use uuid::Uuid;
 
+use crate::commands::handlers::create_book_handler::*;
 use crate::commands::models::create_book_command::CreateBookCommand;
 use crate::infrastructure::errors::error::{AppError, ErrorResponse};
 use crate::infrastructure::extractors::extractor::ValidatedJson;
@@ -16,11 +15,10 @@ use crate::infrastructure::repositories::book_repository::BookRepository;
 use crate::queries::handlers::get_book_by_id_handler::*;
 use crate::queries::handlers::get_books_handler::*;
 use crate::queries::models::book_view::BookView;
-use crate::commands::handlers::create_book_handler::*;
 
 #[derive(Clone)]
 pub struct BookAppState {
-    pub db: DatabaseConnection
+    pub db: DatabaseConnection,
 }
 
 #[derive(OpenApi)]
@@ -50,9 +48,7 @@ pub fn book_router() -> Router<BookAppState> {
     description = "Get the list of books",
     tag = "Books"
 )]
-async fn get_books(
-    State(state): State<BookAppState>,
-) -> Result<impl IntoResponse, AppError> {
+async fn get_books(State(state): State<BookAppState>) -> Result<impl IntoResponse, AppError> {
     let repo = BookRepository::new(&state.db);
     let view = get_books_handler(&repo).await?;
 
@@ -73,7 +69,7 @@ async fn get_books(
 )]
 async fn get_book_by_id(
     State(state): State<BookAppState>,
-    Path(id): Path<Uuid>
+    Path(id): Path<Uuid>,
 ) -> Result<impl IntoResponse, AppError> {
     let repo = BookRepository::new(&state.db);
     let view = get_book_by_id_handler(id, &repo).await?;
@@ -96,7 +92,7 @@ async fn create_book(
     ValidatedJson(cmd): ValidatedJson<CreateBookCommand>,
 ) -> Result<impl IntoResponse, AppError> {
     let repo = BookRepository::new(&state.db);
-    let view =  create_book_handler(cmd, &repo).await?;
+    let view = create_book_handler(cmd, &repo).await?;
 
     Ok(Json(view))
 }
