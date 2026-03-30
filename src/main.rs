@@ -17,6 +17,7 @@ use infrastructure::db::create_db_connection;
 use crate::routes::book_routes::{BookApi};
 
 mod queries;
+mod commands;
 
 #[derive(OpenApi)]
 #[openapi(

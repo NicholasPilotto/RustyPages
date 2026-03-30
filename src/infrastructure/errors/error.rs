@@ -7,7 +7,7 @@ use axum::{
 use sea_orm::DbErr;
 use serde::Serialize;
 use utoipa::ToSchema;
-// use validator::ValidationErrors;
+use validator::ValidationErrors;
 use std::fmt;
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub enum AppError {
     // Domain errors
     NotFound(String),
     BadRequest(String),
-    // ValidationFailed(ValidationErrors),
+    ValidationFailed(ValidationErrors),
 
     // Infrastructure errors
     DatabaseError(DbErr),
@@ -48,6 +48,7 @@ impl fmt::Display for AppError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AppError::NotFound(msg) => write!(f, "{}", msg),
+            AppError::ValidationFailed(errors) => write!(f, "{}", errors),
             AppError::BadRequest(msg) => write!(f, "{}", msg),
             AppError::InternalServerError(msg) => write!(f, "{}", msg),
             AppError::DatabaseError(db_err) => write!(f, "{}", db_err.to_string()),
@@ -69,12 +70,12 @@ impl IntoResponse for AppError {
                     .into_response()
             }
 
-            // AppError::ValidationFailed(errors) => {
-            //     let details = serde_json::to_value(&errors).ok();
-            //     ErrorResponse::new(StatusCode::UNPROCESSABLE_ENTITY, "Validation failed")
-            //         .with_details(details.unwrap_or_default())
-            //         .into_response()
-            // }
+            AppError::ValidationFailed(errors) => {
+                let details = serde_json::to_value(&errors).ok();
+                ErrorResponse::new(StatusCode::BAD_REQUEST, "Validation failed")
+                    .with_details(details.unwrap_or_default())
+                    .into_response()
+            }
 
             AppError::DatabaseError(e) => {
                 // Log the internal detail, return a safe message to the client
@@ -102,8 +103,8 @@ impl IntoResponse for AppError {
 pub struct ErrorResponse {
     pub code: u16,
     pub message: String,
-    // #[serde(skip_serializing_if = "Option::is_none")],
-    // pub details: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub details: Option<serde_json::Value>,
 }
 
 impl ErrorResponse {
@@ -111,17 +112,17 @@ impl ErrorResponse {
         Self {
             code: code.as_u16(),
             message: message.into(),
-            // details: None,
+            details: None,
         }
     }
 
-    // pub fn with_details(
-    //     mut self,
-    //     details: serde_json::Value
-    // ) -> Self {
-    //     self.details = Some(details);
-    //     self
-    // }
+    pub fn with_details(
+        mut self,
+        details: serde_json::Value
+    ) -> Self {
+        self.details = Some(details);
+        self
+    }
 }
 
 impl IntoResponse for ErrorResponse {
