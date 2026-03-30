@@ -1,5 +1,9 @@
 {
     "cSpell.words": [
         "utoipa"
-    ]
+    ],
+    "[rust]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    }
 }
