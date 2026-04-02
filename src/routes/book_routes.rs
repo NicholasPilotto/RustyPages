@@ -94,5 +94,5 @@ async fn create_book(
     let repo = BookRepository::new(&state.db);
     let view = create_book_handler(cmd, &repo).await?;
 
-    Ok(Json(view.id))
+    Ok(Json(view))
 }
